@@ -12,16 +12,76 @@ const STEPS = [
     multi: false,
     q: 'What is your current role?',
     hint: 'Select the option that best describes your position',
-    opts: [
-      { i: '📋', l: 'Project and Programme Manager' },
-      { i: '📊', l: 'Business and Systems Analyst' },
-      { i: '💼', l: 'Sales Professional' },
-      { i: '📣', l: 'Marketing Specialist' },
-      { i: '🤝', l: 'HR and People Ops' },
-      { i: '🎯', l: 'Customer Success' },
-      { i: '⚙️', l: 'Operations and Finance' },
-      { i: '💻', l: 'Software Developer' },
-      { i: '🧭', l: 'Team Lead and Manager' },
+    groups: [
+      { cat: 'Business and Management', opts: [
+        { i: '📋', l: 'Project and Programme Manager' },
+        { i: '📊', l: 'Business Analyst' },
+        { i: '⚙️', l: 'Operations Manager' },
+        { i: '🧭', l: 'Team Lead and Manager' },
+      ]},
+      { cat: 'Construction and Real Estate', opts: [
+        { i: '🏗️', l: 'Site and Project Engineer' },
+        { i: '📐', l: 'Quantity Surveyor' },
+        { i: '🏠', l: 'Property and Real Estate Agent' },
+      ]},
+      { cat: 'Customer and Client Services', opts: [
+        { i: '🎯', l: 'Customer Success' },
+        { i: '🎧', l: 'Customer Support' },
+        { i: '🤝', l: 'Account Manager' },
+      ]},
+      { cat: 'Education', opts: [
+        { i: '🎓', l: 'Teacher, Tutor and Trainer' },
+        { i: '🔬', l: 'Academic Researcher' },
+        { i: '🏫', l: 'Education Administrator' },
+      ]},
+      { cat: 'Finance and Banking', opts: [
+        { i: '📈', l: 'Financial Analyst and Advisor' },
+        { i: '⚖️', l: 'Risk and Compliance Officer' },
+        { i: '🧾', l: 'Accountant and Auditor' },
+        { i: '💳', l: 'Fintech Specialist' },
+      ]},
+      { cat: 'Healthcare', opts: [
+        { i: '⚕️', l: 'Clinical and Medical Staff' },
+        { i: '🏥', l: 'Healthcare Administrator' },
+        { i: '💊', l: 'Pharmacist and Lab Specialist' },
+      ]},
+      { cat: 'HR and People', opts: [
+        { i: '👥', l: 'HR and People Ops' },
+        { i: '🔍', l: 'Talent Acquisition Specialist' },
+        { i: '📚', l: 'Learning and Development' },
+      ]},
+      { cat: 'Legal', opts: [
+        { i: '⚖️', l: 'Legal Counsel and Advisor' },
+        { i: '📄', l: 'Paralegal and Legal Support' },
+        { i: '🔏', l: 'Compliance and Regulatory Officer' },
+      ]},
+      { cat: 'Manufacturing and Logistics', opts: [
+        { i: '🚚', l: 'Supply Chain Coordinator' },
+        { i: '🏭', l: 'Production Supervisor' },
+        { i: '🔎', l: 'Quality and Safety Inspector' },
+      ]},
+      { cat: 'Media and Publishing', opts: [
+        { i: '✍️', l: 'Content Creator and Journalist' },
+        { i: '🎬', l: 'Video and Audio Producer' },
+        { i: '📱', l: 'Social Media Specialist' },
+        { i: '✒️', l: 'Copywriter and Editor' },
+      ]},
+      { cat: 'Public Sector', opts: [
+        { i: '🏛️', l: 'Policy and Regulatory Officer' },
+        { i: '📋', l: 'Civil Servant and Administrator' },
+        { i: '🌍', l: 'Public Health and Social Worker' },
+      ]},
+      { cat: 'Sales and Marketing', opts: [
+        { i: '💼', l: 'Sales Professional' },
+        { i: '📣', l: 'Marketing Specialist' },
+        { i: '🛍️', l: 'E-commerce and Merchandising' },
+      ]},
+      { cat: 'Technology', opts: [
+        { i: '💻', l: 'Software Developer' },
+        { i: '🖥️', l: 'IT and Systems Administrator' },
+        { i: '📊', l: 'Data Analyst and Engineer' },
+        { i: '🔐', l: 'Cybersecurity Specialist' },
+      ]},
     ],
   },
   {
@@ -301,6 +361,12 @@ export default function AuditPage() {
     return Array.isArray(a) ? a.length > 0 : !!a;
   }
 
+  function allOpts(stepIndex) {
+    const s = STEPS[stepIndex];
+    if (s.groups) return s.groups.flatMap(g => g.opts);
+    return s.opts || [];
+  }
+
   async function sendEmail() {
     if (!email || !email.includes('@')) { setEmailError('Please enter a valid email address.'); return; }
     setSendingEmail(true);
@@ -433,26 +499,56 @@ export default function AuditPage() {
               Select all that apply
             </div>
           )}
-          <div style={S.optsGrid}>
-            {s.opts.map(o => {
-              const sel = isSelected(step, o.l);
-              return (
-                <button
-                  key={o.l}
-                  onClick={() => pickOption(step, o.l)}
-                  style={{
-                    ...S.opt,
-                    borderColor: sel ? 'var(--red)' : 'var(--border)',
-                    background: sel ? 'var(--red-bg)' : 'var(--white)',
-                    color: sel ? 'var(--text)' : 'var(--mid)',
-                  }}
-                >
-                  <span style={{ fontSize: 20, flexShrink: 0 }}>{o.i}</span>
-                  {o.l}
-                </button>
-              );
-            })}
-          </div>
+          {s.groups ? (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 24, marginBottom: 40 }}>
+              {s.groups.map(g => (
+                <div key={g.cat}>
+                  <div style={S.catHeader}>{g.cat}</div>
+                  <div style={S.optsGrid}>
+                    {g.opts.map(o => {
+                      const sel = isSelected(step, o.l);
+                      return (
+                        <button
+                          key={o.l}
+                          onClick={() => pickOption(step, o.l)}
+                          style={{
+                            ...S.opt,
+                            borderColor: sel ? 'var(--red)' : 'var(--border)',
+                            background: sel ? 'var(--red-bg)' : 'var(--white)',
+                            color: sel ? 'var(--text)' : 'var(--mid)',
+                          }}
+                        >
+                          <span style={{ fontSize: 20, flexShrink: 0 }}>{o.i}</span>
+                          {o.l}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div style={{ ...S.optsGrid, marginBottom: 40 }}>
+              {s.opts.map(o => {
+                const sel = isSelected(step, o.l);
+                return (
+                  <button
+                    key={o.l}
+                    onClick={() => pickOption(step, o.l)}
+                    style={{
+                      ...S.opt,
+                      borderColor: sel ? 'var(--red)' : 'var(--border)',
+                      background: sel ? 'var(--red-bg)' : 'var(--white)',
+                      color: sel ? 'var(--text)' : 'var(--mid)',
+                    }}
+                  >
+                    <span style={{ fontSize: 20, flexShrink: 0 }}>{o.i}</span>
+                    {o.l}
+                  </button>
+                );
+              })}
+            </div>
+          )}
           <div style={S.fNav}>
             {step > 0
               ? <button style={S.btnBack} onClick={() => setStep(step - 1)}>Back</button>
@@ -705,7 +801,8 @@ const S = {
   qTitle:  { fontFamily: 'DM Serif Display, serif', fontSize: 'clamp(28px, 3.5vw, 44px)', fontWeight: 400, lineHeight: 1.15, color: 'var(--text)', marginBottom: 8 },
   qHint:   { fontSize: 16, color: 'var(--muted)', marginBottom: 16 },
   multiHint: { display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 14, color: 'var(--mid)', background: 'var(--bg)', border: '1px solid var(--border)', padding: '5px 12px', marginBottom: 24 },
-  optsGrid: { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 40 },
+  catHeader: { fontFamily: 'DM Sans, sans-serif', fontSize: 13, fontWeight: 600, color: 'var(--muted)', letterSpacing: '0.06em', padding: '7px 0', borderBottom: '1px solid var(--border)', marginBottom: 10 },
+  optsGrid: { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 },
   opt:     { padding: '16px 18px', border: '1px solid', background: 'var(--white)', cursor: 'pointer', textAlign: 'left', fontFamily: 'DM Sans, sans-serif', fontSize: 16, display: 'flex', alignItems: 'flex-start', gap: 12, lineHeight: 1.4, transition: 'all 0.15s', boxShadow: '0 1px 4px rgba(0,0,0,0.05)' },
   fNav:    { display: 'flex', alignItems: 'center', justifyContent: 'space-between' },
   btnBack: { background: 'none', border: '1px solid var(--border)', color: 'var(--muted)', padding: '12px 24px', fontFamily: 'DM Sans, sans-serif', fontSize: 16, cursor: 'pointer' },
