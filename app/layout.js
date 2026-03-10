@@ -1,10 +1,10 @@
 import './globals.css';
 
 export const metadata = {
-  title: 'AIJobRadar — How close are you to being replaced?',
+  title: 'AIJobRadar — How close are you to being replaced by AI?',
   description: 'Get your personal AI Displacement Risk Score. Scored across 5 dimensions, benchmarked against your peers.',
   openGraph: {
-    title: 'AIJobRadar — How close are you to being replaced?',
+    title: 'AIJobRadar — How close are you to being replaced by AI?',
     description: 'Get your personal AI Displacement Risk Score in 2 minutes.',
     url: 'https://aijobradar.app',
     siteName: 'AIJobRadar',

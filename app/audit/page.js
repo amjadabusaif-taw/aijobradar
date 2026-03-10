@@ -414,8 +414,8 @@ export default function AuditPage() {
           <Logo />
           <div style={{ padding: '48px 0 40px' }}>
             <h1 style={S.heroH1}>
-              How close are you to being{' '}
-              <span style={{ color: 'var(--red)' }}>replaced?</span>
+              How close are you to being replaced{' '}
+              <span style={{ color: 'var(--red)' }}>by AI?</span>
             </h1>
             <p style={S.heroP}>
               Answer 6 questions. Get your personal AI Displacement Risk Score — scored across 5 dimensions and benchmarked against your peers.
