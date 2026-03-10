@@ -823,7 +823,7 @@ const S = {
   qTitle:  { fontFamily: 'DM Serif Display, serif', fontSize: 'clamp(28px, 3.5vw, 44px)', fontWeight: 400, lineHeight: 1.15, color: 'var(--text)', marginBottom: 8 },
   qHint:   { fontSize: 16, color: 'var(--muted)', marginBottom: 16 },
   multiHint: { display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 14, color: 'var(--mid)', background: 'var(--bg)', border: '1px solid var(--border)', padding: '5px 12px', marginBottom: 24 },
-  catHeader: { fontFamily: 'DM Sans, sans-serif', fontSize: 15, fontWeight: 700, color: 'var(--text)', letterSpacing: '0.02em', padding: '8px 0', borderBottom: '2px solid var(--border)', marginBottom: 10 },
+  catHeader: { fontFamily: 'DM Sans, sans-serif', fontSize: 16, fontWeight: 700, color: '#000000', letterSpacing: '0.02em', padding: '8px 0', borderBottom: '2px solid var(--border)', marginBottom: 10 },
   optsGrid: { display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 8 },
   opt:     { padding: '10px 12px', border: '1px solid', background: 'var(--white)', cursor: 'pointer', textAlign: 'left', fontFamily: 'DM Sans, sans-serif', fontSize: 14, display: 'flex', alignItems: 'flex-start', gap: 8, lineHeight: 1.35, transition: 'all 0.15s', boxShadow: '0 1px 3px rgba(0,0,0,0.04)' },
   fNav:    { display: 'flex', alignItems: 'center', justifyContent: 'space-between' },
