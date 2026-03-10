@@ -328,7 +328,7 @@ function buildResults(ans) {
     : `are taking ${numActions} active steps to address it`;
 
   // Role-specific action plans
-  const actions = buildActionPlan(role, industry, { doingNothing, activelyAdapt, pivoting, watching, fearsObsolete, fearsSalary, fearsOutpaced, fearsToolGap, numFears, numActions });
+  const actionPlan = buildActionPlan(role, industry, { doingNothing, activelyAdapt, pivoting, watching, fearsObsolete, fearsSalary, fearsOutpaced, fearsToolGap, numFears, numActions });
 
   // Product recommendations
   const recommendations = getRecommendations(role, dims);
@@ -344,7 +344,7 @@ function buildResults(ans) {
       : numActions >= 3
       ? 'You are taking more action than most. The risk now is losing focus \u2014 prioritise the actions with the highest impact on your specific role.'
       : 'The gap between knowing you need to adapt and actually adapting is where careers quietly end.',
-    actions,
+    actions: actionPlan,
   };
 }
 
