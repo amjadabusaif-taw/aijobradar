@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { getRecommendations } from './products';
 
 // ─── DATA ────────────────────────────────────────────────────────────────────
 
@@ -173,7 +174,6 @@ const STEPS = [
 
 // ─── SCORING ─────────────────────────────────────────────────────────────────
 
-function rand(n) { return Math.floor(Math.random() * n); }
 function clamp(v, a, b) { return Math.max(a, Math.min(b, v)); }
 function scoreColor(s) {
   if (s >= 65) return '#c0392b';
@@ -181,6 +181,48 @@ function scoreColor(s) {
   if (s >= 34) return '#1d4ed8';
   return '#15803d';
 }
+
+// Deterministic variation based on input string (replaces rand())
+function stableOffset(str, range) {
+  let h = 0;
+  for (let i = 0; i < str.length; i++) h = ((h << 5) - h + str.charCodeAt(i)) | 0;
+  return Math.abs(h) % range;
+}
+
+// Role-specific automation weights — higher = more automatable
+const AUTOMATION_WEIGHT = {
+  'Project and Programme Manager': 58, 'Business Analyst': 55, 'Operations Manager': 52, 'Team Lead and Manager': 48,
+  'Site and Project Engineer': 38, 'Quantity Surveyor': 62, 'Property and Real Estate Agent': 55,
+  'Customer Success': 50, 'Customer Support': 72, 'Account Manager': 45,
+  'Teacher, Tutor and Trainer': 40, 'Academic Researcher': 48, 'Education Administrator': 65,
+  'Financial Analyst and Advisor': 62, 'Risk and Compliance Officer': 55, 'Accountant and Auditor': 70, 'Fintech Specialist': 45,
+  'Clinical and Medical Staff': 30, 'Healthcare Administrator': 65, 'Pharmacist and Lab Specialist': 50,
+  'HR and People Ops': 52, 'Talent Acquisition Specialist': 58, 'Learning and Development': 50,
+  'Legal Counsel and Advisor': 48, 'Paralegal and Legal Support': 72, 'Compliance and Regulatory Officer': 55,
+  'Supply Chain Coordinator': 60, 'Production Supervisor': 42, 'Quality and Safety Inspector': 45,
+  'Content Creator and Journalist': 68, 'Video and Audio Producer': 55, 'Social Media Specialist': 70, 'Copywriter and Editor': 75,
+  'Policy and Regulatory Officer': 45, 'Civil Servant and Administrator': 62, 'Public Health and Social Worker': 35,
+  'Sales Professional': 50, 'Marketing Specialist': 62, 'E-commerce and Merchandising': 58,
+  'Software Developer': 55, 'IT and Systems Administrator': 60, 'Data Analyst and Engineer': 58, 'Cybersecurity Specialist': 42,
+};
+
+// Role-specific task descriptions for the automation dimension
+const ROLE_TASKS = {
+  'Project and Programme Manager': 'status reporting, scheduling, resource allocation, and stakeholder updates',
+  'Business Analyst': 'requirements documentation, process mapping, data gathering, and report generation',
+  'Operations Manager': 'workflow coordination, performance tracking, process documentation, and resource scheduling',
+  'Team Lead and Manager': 'status updates, reporting, scheduling, documentation, and performance tracking',
+  'Customer Support': 'ticket triage, FAQ responses, status updates, and initial troubleshooting',
+  'Customer Success': 'health score monitoring, renewal tracking, onboarding checklists, and usage reporting',
+  'Account Manager': 'CRM updates, proposal drafts, meeting scheduling, and activity logging',
+  'Financial Analyst and Advisor': 'financial modelling, report generation, data reconciliation, and scenario analysis',
+  'Accountant and Auditor': 'bookkeeping, transaction reconciliation, audit sampling, and tax preparation',
+  'Software Developer': 'boilerplate code, test writing, documentation, bug detection, and code review',
+  'Data Analyst and Engineer': 'data pipeline creation, SQL queries, dashboard building, and exploratory analysis',
+  'Content Creator and Journalist': 'first-draft articles, social media copy, research summaries, and content briefs',
+  'Copywriter and Editor': 'first-draft copy, product descriptions, email sequences, and content variations',
+  'Paralegal and Legal Support': 'document review, legal research, filing preparation, and contract analysis',
+};
 
 function buildResults(ans) {
   const role     = ans.role     || 'Professional';
@@ -200,88 +242,153 @@ function buildResults(ans) {
   const fearsObsolete = fearStr.includes('obsolete') || fearStr.includes('automated away');
   const fearsSalary   = fearStr.includes('salary');
   const fearsOutpaced = fearStr.includes('outpacing');
+  const fearsAlready  = fearStr.includes('already doing');
+  const fearsToolGap  = fearStr.includes('do not know which');
   const numFears      = fears.length;
-  const numActions    = actions.length;
+  const numActions    = actions.filter(a => !a.includes('nothing')).length;
 
-  const base        = doingNothing ? 72 : activelyAdapt ? 40 : watching ? 58 : 54;
+  // Deterministic offsets based on unique input combination
+  const seed = `${role}|${exp}|${industry}|${location}`;
+  const off1 = stableOffset(seed + 'auto', 8);
+  const off2 = stableOffset(seed + 'irre', 8);
+  const off3 = stableOffset(seed + 'econ', 8);
+  const off4 = stableOffset(seed + 'adpt', 8);
+  const off5 = stableOffset(seed + 'pivt', 8);
+
+  // Experience modifier: more experience = slightly more to lose, but also more resilience
+  const expMod = exp.includes('Under 2') ? -5 : exp.includes('2 to 5') ? -2 : exp.includes('20') ? 4 : exp.includes('11') ? 3 : 0;
+
+  // Base automation score from role-specific weight
+  const autoBase = AUTOMATION_WEIGHT[role] || 52;
   const fearPenalty = Math.min(numFears * 3, 12);
-  const actionBonus = activelyAdapt ? Math.min(numActions * 4, 14) : 0;
+  const actionBonus = activelyAdapt ? Math.min(numActions * 5, 15) : watching ? 3 : 0;
+
+  const roleTasks = ROLE_TASKS[role] || 'reporting, documentation, scheduling, and routine analysis';
 
   const dims = [
     {
       name: 'Task Automation Exposure',
       label: 'How much of your job can AI do?',
-      score: clamp(base + fearPenalty - actionBonus + rand(10), 10, 95),
-      urgency: fearsObsolete || doingNothing ? 'HIGH' : 'MEDIUM',
-      text: `A significant portion of your daily ${role.toLowerCase()} tasks — status updates, reporting, scheduling, documentation — are already being handled by AI tools in your industry.${fearsObsolete ? ' Your own concern about obsolescence signals you already feel this pressure.' : ''}`,
+      score: clamp(autoBase + fearPenalty - actionBonus + off1 + expMod, 10, 95),
+      urgency: autoBase >= 65 || (fearsObsolete && doingNothing) ? 'HIGH' : autoBase >= 50 ? 'MEDIUM' : 'LOW',
+      text: `A significant portion of your daily ${role.toLowerCase()} tasks \u2014 ${roleTasks} \u2014 are already being handled by AI tools in ${industry.toLowerCase()}.${fearsObsolete ? ' Your own concern about obsolescence signals you already feel this pressure.' : fearsAlready ? ' You have already noticed AI encroaching on your work. That awareness is accurate.' : ''}`,
     },
     {
       name: 'Human Irreplaceability',
       label: 'What makes you hard to replace?',
-      score: clamp(90 - base - fearPenalty + actionBonus + rand(10), 10, 92),
-      urgency: activelyAdapt ? 'LOW' : fearsObsolete ? 'HIGH' : 'MEDIUM',
-      text: `Your value lies in judgment, stakeholder trust, and contextual experience. ${activelyAdapt && numActions >= 2 ? 'The fact that you are taking multiple active steps is building real defences.' : doingNothing ? 'Your current inaction is quietly eroding your irreplaceability.' : 'You are aware of the threat but your actions need to match your awareness.'}`,
+      score: clamp(92 - autoBase - fearPenalty + actionBonus + off2, 10, 92),
+      urgency: activelyAdapt && numActions >= 2 ? 'LOW' : doingNothing ? 'HIGH' : 'MEDIUM',
+      text: `Your value as a ${role.toLowerCase()} lies in judgment, stakeholder trust, and contextual experience that AI cannot replicate. ${activelyAdapt && numActions >= 2 ? 'Your active investment in multiple areas is building real defences.' : doingNothing ? 'Your current inaction is quietly eroding the advantage your experience gives you.' : 'You are aware of the threat, but your actions need to match your awareness before that advantage fades.'}`,
     },
     {
       name: 'Economic Substitution Risk',
       label: 'Are you competitively priced?',
-      score: clamp(base - 5 + (fearsSalary ? 8 : 0) + rand(10), 10, 90),
-      urgency: fearsSalary ? 'HIGH' : 'MEDIUM',
-      text: `In ${industry}, AI-augmented professionals are completing the same work 40% faster. This is already suppressing salary growth for those who have not adapted.${fearsSalary ? ' You are right to be concerned — salary compression is already happening in your sector.' : ''}`,
+      score: clamp(autoBase - 6 + (fearsSalary ? 10 : 0) + off3 + expMod, 10, 90),
+      urgency: fearsSalary ? 'HIGH' : autoBase >= 60 ? 'MEDIUM' : 'LOW',
+      text: `In ${industry.toLowerCase()}, AI-augmented professionals are completing the same work significantly faster. ${fearsSalary ? 'You are right to be concerned \u2014 salary compression is already visible in your sector, and it accelerates as AI tools become standard.' : `This is already suppressing salary growth for ${role.toLowerCase()}s who have not adapted.`}`,
     },
     {
       name: 'Adaptability Velocity',
       label: 'How fast are you adapting?',
-      score: clamp(doingNothing ? 25 + rand(15) : activelyAdapt ? 60 + rand(20) : 38 + rand(18), 10, 92),
+      score: clamp(doingNothing ? 22 + off4 : activelyAdapt ? 58 + numActions * 5 + off4 : watching ? 35 + off4 : 40 + off4, 10, 92),
       urgency: doingNothing ? 'HIGH' : activelyAdapt && numActions >= 2 ? 'LOW' : 'MEDIUM',
       text: doingNothing
-        ? 'Every month of inaction compounds your disadvantage. AI tools in your field are advancing whether you engage with them or not.'
+        ? `Every month of inaction compounds your disadvantage. AI tools relevant to ${role.toLowerCase()}s in ${industry.toLowerCase()} are advancing whether you engage with them or not.`
         : activelyAdapt && numActions >= 2
-        ? 'You are taking multiple active steps — this is exactly the right approach. Keep the pace up.'
+        ? 'You are taking multiple active steps \u2014 this is exactly the right approach. The key now is consistency and focus on the highest-impact areas.'
         : fearsOutpaced
-        ? 'Your concern about being outpaced by peers is well-founded. The gap between watchers and doers is widening fast.'
-        : 'You are moving, but the pace of AI advancement rewards early movers disproportionately.',
+        ? 'Your concern about being outpaced by peers is well-founded. The gap between those who use AI tools daily and those who watch from the sideline is widening fast.'
+        : fearsToolGap
+        ? 'You have identified that you do not know which AI tools to learn. That honesty is the first step \u2014 but the window for action is narrowing.'
+        : 'You are moving, but the pace of AI advancement rewards early movers disproportionately. Watching is not adapting.',
     },
     {
       name: 'Strategic Pivot Readiness',
       label: 'Do you have an exit plan?',
-      score: clamp(pivoting ? 70 + rand(15) : doingNothing ? 25 + rand(15) : 38 + rand(20), 10, 92),
+      score: clamp(pivoting ? 68 + off5 : doingNothing ? 22 + off5 : 36 + off5, 10, 92),
       urgency: pivoting ? 'LOW' : doingNothing ? 'HIGH' : 'MEDIUM',
-      text: `Your ability to pivot — whether to a more AI-resistant role, a new industry, or a hybrid position — determines your long-term resilience. ${pivoting ? 'The fact that you are already exploring a career change puts you ahead of most.' : 'Right now you have no documented exit plan, which increases your overall exposure.'}`,
+      text: `Your ability to pivot \u2014 whether to a more AI-resistant role, a new industry, or a hybrid position \u2014 determines your long-term resilience as a ${role.toLowerCase()}. ${pivoting ? 'The fact that you are already exploring a career change puts you ahead of most. Now make it concrete with specific targets and skill gaps.' : 'Right now you have no documented exit plan, which increases your overall exposure to displacement.'}`,
     },
   ];
 
   const overall = Math.round(dims.map(d => d.score).reduce((a, b) => a + b, 0) / dims.length);
   const risk    = overall >= 65 ? 'HIGH' : overall >= 48 ? 'MEDIUM' : 'LOW';
 
-  const fearSummary   = numFears === 1
-    ? `one primary concern: ${fears[0].toLowerCase()}`
-    : `${numFears} concerns including ${fears.slice(0, 2).map(f => f.toLowerCase()).join(' and ')}`;
+  // Clean summary paragraph
+  const expLabel = exp.toLowerCase().replace('under ', 'less than ');
+  const fearSummary = numFears === 0
+    ? 'no stated concerns'
+    : numFears === 1
+    ? `one primary concern: ${fears[0].charAt(0).toLowerCase() + fears[0].slice(1)}`
+    : `${numFears} concerns, including ${fears[0].charAt(0).toLowerCase() + fears[0].slice(1)}`;
   const actionSummary = doingNothing
-    ? 'are currently taking no active steps'
+    ? 'are not currently taking active steps to address it'
     : numActions === 1
-    ? 'are taking one active step'
-    : `are taking ${numActions} active steps`;
+    ? 'are taking one active step to address it'
+    : `are taking ${numActions} active steps to address it`;
+
+  // Role-specific action plans
+  const actions = buildActionPlan(role, industry, { doingNothing, activelyAdapt, pivoting, watching, fearsObsolete, fearsSalary, fearsOutpaced, fearsToolGap, numFears, numActions });
+
+  // Product recommendations
+  const recommendations = getRecommendations(role, dims);
 
   return {
-    overall, risk, role, exp, industry, location, dims,
-    summary: `You are a ${exp} ${role.toLowerCase()} in ${industry} based in ${location}. You have ${fearSummary}, and you ${actionSummary} to address your AI displacement risk.`,
-    percentile: `You are below 65% of ${role.toLowerCase()}s at your experience level who are actively managing their AI displacement risk.`,
+    overall, risk, role, exp, industry, location, dims, recommendations,
+    summary: `You are a ${role.toLowerCase()} with ${expLabel} of experience, working in ${industry.toLowerCase()} and based in ${location}. You have ${fearSummary}, and you ${actionSummary}.`,
+    percentile: `Your overall displacement risk is ${risk.toLowerCase()} relative to professionals in similar roles who are actively managing their AI exposure.`,
     warning: doingNothing && numFears >= 2
-      ? `You have identified ${numFears} real threats to your career and are doing nothing about any of them. That is not a position — it is a liability.`
+      ? `You have identified ${numFears} real threats to your career and are doing nothing about any of them. That is not a position \u2014 it is a liability.`
       : doingNothing
-      ? 'At your current trajectory, you are not preparing for disruption — you are practising for it.'
+      ? 'At your current trajectory, you are not preparing for disruption \u2014 you are practising for it.'
       : numActions >= 3
-      ? 'You are taking more action than most. The risk now is losing focus — prioritise the actions with the highest impact on your specific role.'
+      ? 'You are taking more action than most. The risk now is losing focus \u2014 prioritise the actions with the highest impact on your specific role.'
       : 'The gap between knowing you need to adapt and actually adapting is where careers quietly end.',
-    actions: [
-      { n: 1, time: 'Next 7 days',  impact: 'HIGH',   dim: 'Task Automation Exposure',  text: `Audit your current role. List every recurring task and identify which ones an AI tool can already perform. This is your personal threat map — it will make every other action more targeted.` },
-      { n: 2, time: 'Next 30 days', impact: 'HIGH',   dim: 'Adaptability Velocity',      text: `Deploy one AI productivity tool directly in your daily workflow and use it every day until it becomes second nature. Passive awareness of what is available counts for nothing — active use is what changes your exposure score.` },
-      { n: 3, time: 'Next 30 days', impact: 'HIGH',   dim: 'Human Irreplaceability',     text: `Identify the three decisions in your role that require human judgment and make those your visible speciality. Document them and present them to leadership — your irreplaceability must be visible to count.` },
-      { n: 4, time: 'Next 60 days', impact: 'MEDIUM', dim: 'Adaptability Velocity',      text: `Research one AI certification relevant to your role and enrol. Your CV needs a visible signal that you are not standing still — especially relevant given your concern about ${fearsSalary ? 'salary compression' : fearsOutpaced ? 'being outpaced by peers' : 'skill obsolescence'}.` },
-      { n: 5, time: 'Next 90 days', impact: 'MEDIUM', dim: 'Strategic Pivot Readiness',  text: `Map two adjacent roles that are more AI-resistant and that your skills transfer to. Keep them as live options. ${pivoting ? 'You are already thinking about this — now make it concrete with names, companies, and required skill gaps.' : 'Having no exit plan is a risk multiplier for everything else.'}` },
-    ],
+    actions,
   };
+}
+
+// ─── ROLE-SPECIFIC ACTION PLANS ──────────────────────────────────────────────
+
+function buildActionPlan(role, industry, ctx) {
+  const r = role.toLowerCase();
+  const ind = industry.toLowerCase();
+
+  // Role-specific step 1 (always: audit your specific tasks)
+  const step1Map = {
+    'Project and Programme Manager': `Audit your project management workflow. List every recurring task \u2014 status reports, schedule updates, stakeholder emails, resource tracking \u2014 and identify which ones an AI tool category can already handle. This is your personal threat map for PM work.`,
+    'Business Analyst': `Map your BA deliverables end to end. Identify which outputs \u2014 requirements documents, process flows, data analysis, meeting notes \u2014 AI can already produce a first draft of. Your threat map starts with the deliverables, not the title.`,
+    'Customer Support': `Log every support interaction type you handle this week. Categorise each as: fully automatable (FAQ, status checks), partially automatable (guided troubleshooting), or human-only (complex escalations, emotional de-escalation). Your ratio determines your exposure.`,
+    'Customer Success': `Map your client interactions for the past month. Separate transactional touchpoints (check-ins, renewals, usage reviews) from trust-layer work (strategic advice, relationship repair, expansion conversations). The transactional side is automating first.`,
+    'Financial Analyst and Advisor': `Audit your analytical workflow. List every report, model, and analysis you produce regularly and assess which ones AI tools can now generate a credible first draft of. Your value is shifting from production to interpretation \u2014 make sure your time allocation reflects that.`,
+    'Software Developer': `Review your last two weeks of work. Categorise each task: boilerplate and implementation (AI can accelerate), debugging and testing (AI can assist), or architecture and design decisions (human judgment required). The ratio reveals your exposure.`,
+    'Content Creator and Journalist': `Audit your content output from the past month. For each piece, honestly assess: could AI have produced an acceptable first draft? Your highest-value work is where the answer is no \u2014 original reporting, distinctive voice, strategic narrative. That is where your time should shift.`,
+    'Copywriter and Editor': `List every type of copy you produce. Product descriptions, email sequences, social posts, ad copy, blog posts. For each, rate how close AI-generated output gets to your quality level. The categories where AI reaches 80% of your quality are the ones being commoditised first.`,
+    'Legal Counsel and Advisor': `Audit your billable work from the past month. Separate research and document production from advisory and strategic counsel. AI is automating the first category. Your career security depends on increasing the ratio of the second.`,
+    'Paralegal and Legal Support': `Map every task type in your role: document review, research, filing, contract analysis, correspondence. Rate each for AI automation potential. This audit will be uncomfortable \u2014 paralegal work has among the highest automation exposure. That clarity is what lets you act.`,
+  };
+
+  // Role-specific step 3 (human irreplaceability)
+  const step3Map = {
+    'Project and Programme Manager': `Identify the three judgment calls in your PM role that no tool can make \u2014 stakeholder prioritisation, risk trade-offs, team dynamics decisions. Document specific examples and present them to leadership. Your irreplaceability must be visible to count.`,
+    'Business Analyst': `Document three instances where your interpretation of requirements changed a project outcome. The analysis AI can do. The judgment call about what the stakeholder actually needs versus what they asked for \u2014 that is your irreplaceable contribution.`,
+    'Customer Support': `Identify the escalation patterns where human judgment changes the outcome \u2014 angry customers, complex multi-system issues, situations requiring empathy. Start tracking resolution quality for these cases. That data proves your value.`,
+    'Customer Success': `Build a client success story document: three accounts where your personal judgment, relationship, or strategic advice drove retention or expansion. This is not a vanity exercise \u2014 it is evidence that your role is not reducible to a health score dashboard.`,
+    'Software Developer': `Identify three architecture or design decisions you made this quarter that required understanding business context, not just technical requirements. Document them. The developer who can explain why a system was built this way is harder to replace than the one who built it.`,
+    'Content Creator and Journalist': `Identify what makes your creative work recognisably yours \u2014 your perspective, your sources, your narrative style, your audience understanding. Document it. When anyone can produce competent content, distinctive voice becomes the moat.`,
+    'Financial Analyst and Advisor': `Identify three client or stakeholder decisions that were influenced by your interpretation, not just your analysis. The spreadsheet is a commodity. Your ability to say "here is what this means and what you should do about it" is not.`,
+  };
+
+  const defaultStep1 = `Audit your current role as a ${r}. List every recurring task and identify which ones an AI tool category can already perform. Be specific \u2014 not "AI might affect my job" but "this specific weekly task is already automatable." This is your personal threat map.`;
+  const defaultStep3 = `Identify the three decisions in your ${r} role that require human judgment \u2014 context, relationships, or ambiguity that no tool can navigate. Document them and make them visible to leadership. Your irreplaceability must be seen to count.`;
+
+  return [
+    { n: 1, time: 'Next 7 days',  impact: 'HIGH',   dim: 'Task Automation Exposure',  text: step1Map[role] || defaultStep1 },
+    { n: 2, time: 'Next 30 days', impact: 'HIGH',   dim: 'Adaptability Velocity',      text: `Deploy one AI productivity tool relevant to ${r} work in ${ind} and use it daily for one specific task until it becomes second nature. Passive awareness of available tools counts for nothing \u2014 active daily use is what changes your exposure score and signals adaptability to employers.` },
+    { n: 3, time: 'Next 30 days', impact: 'HIGH',   dim: 'Human Irreplaceability',     text: step3Map[role] || defaultStep3 },
+    { n: 4, time: 'Next 60 days', impact: 'MEDIUM', dim: 'Adaptability Velocity',      text: `Research one AI-related certification or credential relevant to ${r} roles in ${ind} and enrol. Your CV needs a visible signal that you are not standing still${ctx.fearsToolGap ? ' \u2014 especially since you have identified not knowing which AI tools to learn as a concern' : ctx.fearsSalary ? ' \u2014 particularly given the salary compression happening in your sector' : ''}.` },
+    { n: 5, time: 'Next 90 days', impact: 'MEDIUM', dim: 'Strategic Pivot Readiness',  text: `Map two roles adjacent to ${r} that are more AI-resistant and that your skills transfer to. Research what each requires and identify specific skill gaps. ${ctx.pivoting ? 'You are already thinking about a career change \u2014 now make it concrete with target roles, companies, and a timeline.' : 'Having no exit plan is a risk multiplier for everything else on this report.'}` },
+  ];
 }
 
 // ─── COMPONENT ───────────────────────────────────────────────────────────────
@@ -729,12 +836,84 @@ export default function AuditPage() {
           })}
         </div>
 
+        {/* 90-Day Action Plan */}
+        <div style={S.secLabel}>Your 90-Day Action Plan</div>
+        {d.actions.map(a => (
+          <div key={a.n} style={S.actItem}>
+            <div style={S.actNum}>0{a.n}</div>
+            <div>
+              <div style={{ display: 'flex', gap: 10, alignItems: 'center', marginBottom: 8 }}>
+                <span style={S.actTime}>{a.time}</span>
+                <span style={{
+                  ...S.actImpact,
+                  color: a.impact === 'HIGH' ? 'var(--red)' : 'var(--muted)',
+                  borderColor: a.impact === 'HIGH' ? 'var(--red-border)' : 'var(--border)',
+                  background: a.impact === 'HIGH' ? 'var(--red-bg)' : 'transparent',
+                }}>{a.impact} impact</span>
+              </div>
+              <p style={S.actText}>{a.text}</p>
+              <div style={S.actDim}>Dimension: {a.dim}</div>
+            </div>
+          </div>
+        ))}
+        <div style={{ height: 44 }} />
 
+
+        {/* Product Recommendations */}
+        <div style={{ marginBottom: 24 }}>
+          <div style={S.secLabel}>Recommended For Your Results</div>
+          <p style={{ fontSize: 15, color: 'var(--muted)', marginBottom: 20, lineHeight: 1.65 }}>
+            Based on your role, industry, and dimension scores, these resources address your specific displacement risks.
+          </p>
+          {d.recommendations && d.recommendations.map((rec, i) => (
+            <div key={rec.id || i} style={{
+              border: i === 0 ? '1px solid var(--red)' : '1px solid var(--border)',
+              background: i === 0 ? 'var(--red-bg)' : 'var(--white)',
+              padding: '22px 24px',
+              marginBottom: 10,
+            }}>
+              <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 16 }}>
+                <div style={{ flex: 1 }}>
+                  <div style={{ fontFamily: 'DM Mono, monospace', fontSize: 10, letterSpacing: '0.12em', textTransform: 'uppercase', color: i === 0 ? 'var(--red)' : 'var(--muted)', marginBottom: 6 }}>
+                    {rec.tag}
+                  </div>
+                  <div style={{ fontFamily: 'DM Serif Display, serif', fontSize: 20, color: 'var(--text)', marginBottom: 4, lineHeight: 1.25 }}>
+                    {rec.title}
+                  </div>
+                  <div style={{ fontSize: 13, color: 'var(--muted)', marginBottom: 8, fontStyle: 'italic' }}>
+                    {rec.subtitle}
+                  </div>
+                  <p style={{ fontSize: 14, color: 'var(--mid)', lineHeight: 1.6, marginBottom: 10 }}>
+                    {rec.desc}
+                  </p>
+                  <div style={{ fontSize: 12, color: 'var(--muted)', fontFamily: 'DM Mono, monospace' }}>
+                    {rec.reason}
+                  </div>
+                </div>
+                <a
+                  href={rec.coming ? undefined : rec.url}
+                  onClick={rec.coming ? (e) => e.preventDefault() : undefined}
+                  style={{
+                    display: 'inline-flex', alignItems: 'center', gap: 8,
+                    padding: '10px 20px', flexShrink: 0, textDecoration: 'none',
+                    fontFamily: 'DM Sans, sans-serif', fontSize: 14, fontWeight: 500, whiteSpace: 'nowrap',
+                    background: rec.coming ? 'var(--border)' : i === 0 ? 'var(--red)' : 'var(--text)',
+                    color: rec.coming ? 'var(--muted)' : '#fff',
+                    cursor: rec.coming ? 'default' : 'pointer',
+                    border: 'none',
+                  }}
+                >
+                  {rec.coming ? 'Coming Soon' : 'Get This Guide →'}
+                </a>
+              </div>
+            </div>
+          ))}
+        </div>
 
         {/* Email capture */}
         <div style={S.emailBox}>
-          <div style={S.emailTitle}>Your 90-day action plan is ready</div>
-          <p style={S.emailSub}>Enter your email to unlock all 5 steps — including your highest-impact action for {d.role.toLowerCase()} roles in {d.industry}.</p>
+          <div style={S.emailTitle}>Get your full report by email</div>
+          <p style={S.emailSub}>Your complete report with all 5 action steps, dimension scores, and personalised recommendations — sent to your inbox.</p>
           {emailSent ? (
             <div style={S.emailSuccess}>Report sent. Check your inbox.</div>
           ) : (
@@ -755,12 +934,8 @@ export default function AuditPage() {
           {emailError && <p style={{ color: 'var(--red)', fontSize: 14, marginTop: 8 }}>{emailError}</p>}
         </div>
 
-        {/* CTA */}
-        <div style={S.ctaBox}>
-          <div style={S.ctaTitle}>Stay ahead of the radar.</div>
-          <p style={S.ctaSub}>Pro members get monthly AI threat briefings, score tracking, and a living career dossier.</p>
-          <a href="#" style={S.btnCta}>Upgrade to Pro</a>
-          <br />
+        {/* Restart */}
+        <div style={{ textAlign: 'center', marginTop: 20 }}>
           <button style={S.btnRestart} onClick={restart}>Run a new scan</button>
         </div>
       </div>
