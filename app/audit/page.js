@@ -459,9 +459,31 @@ export default function AuditPage() {
   if (screen === 'form') {
     const s = STEPS[step];
     return (
-      <div style={S.fGrid}>
+      <div className="f-grid" style={S.fGrid}>
+        <style>{`
+          @media (max-width: 767px) {
+            .f-sidebar { display: none !important; }
+            .f-grid    { grid-template-columns: 1fr !important; }
+            .f-body    { padding: 24px 20px !important; max-width: 100% !important; }
+            .f-opts    { grid-template-columns: repeat(2, 1fr) !important; }
+            .f-progress-bar { display: flex !important; }
+          }
+          @media (min-width: 768px) {
+            .f-progress-bar { display: none !important; }
+          }
+        `}</style>
+        {/* Mobile progress bar */}
+        <div className="f-progress-bar" style={{ display: 'none', flexDirection: 'column', background: 'var(--bg)', borderBottom: '1px solid var(--border)', padding: '14px 20px', gap: 8, position: 'sticky', top: 0, zIndex: 10 }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div style={{ fontFamily: 'DM Mono, monospace', fontSize: 14, color: 'var(--text)', fontWeight: 500 }}>AI<span style={{ color: 'var(--red)' }}>Job</span>Radar</div>
+            <div style={{ fontFamily: 'DM Mono, monospace', fontSize: 13, color: 'var(--muted)' }}>Step {step + 1} of {STEPS.length} — {STEPS[step].label}</div>
+          </div>
+          <div style={{ height: 3, background: 'var(--border)', borderRadius: 2, overflow: 'hidden' }}>
+            <div style={{ height: '100%', width: `${((step + 1) / STEPS.length) * 100}%`, background: 'var(--red)', transition: 'width 0.3s ease', borderRadius: 2 }} />
+          </div>
+        </div>
         {/* Sidebar */}
-        <div style={S.fSidebar}>
+        <div className="f-sidebar" style={S.fSidebar}>
           <div style={S.sbLogo}>AI<span style={{ color: 'var(--red)' }}>Job</span>Radar</div>
           {STEPS.map((st, i) => (
             <div key={st.id} style={{
@@ -484,7 +506,7 @@ export default function AuditPage() {
           ))}
         </div>
         {/* Form body */}
-        <div style={S.fBody}>
+        <div className="f-body" style={S.fBody}>
           <div style={S.qNum}>Question {step + 1} of {STEPS.length}</div>
           <h2 style={S.qTitle}>{s.q}</h2>
           <p style={S.qHint}>{s.hint}</p>
@@ -504,7 +526,7 @@ export default function AuditPage() {
               {s.groups.map(g => (
                 <div key={g.cat}>
                   <div style={S.catHeader}>{g.cat}</div>
-                  <div style={S.optsGrid}>
+                  <div className="f-opts" style={S.optsGrid}>
                     {g.opts.map(o => {
                       const sel = isSelected(step, o.l);
                       return (
@@ -528,7 +550,7 @@ export default function AuditPage() {
               ))}
             </div>
           ) : (
-            <div style={{ ...S.optsGrid, marginBottom: 40 }}>
+            <div className="f-opts" style={{ ...S.optsGrid, marginBottom: 40 }}>
               {s.opts.map(o => {
                 const sel = isSelected(step, o.l);
                 return (
@@ -789,21 +811,21 @@ const S = {
   rightQuote: { background: 'var(--white)', border: '1px solid var(--border)', borderLeft: '4px solid var(--red)', padding: '22px 24px' },
   rightQuoteP: { fontFamily: 'DM Serif Display, serif', fontSize: 20, color: 'var(--text)', lineHeight: 1.6 },
   // Form
-  fGrid:   { display: 'grid', gridTemplateColumns: '260px 1fr', minHeight: '100vh' },
-  fSidebar: { background: 'var(--bg)', borderRight: '1px solid var(--border)', padding: '48px 28px', height: '100vh', position: 'sticky', top: 0, overflow: 'hidden' },
+  fGrid:   { display: 'grid', gridTemplateColumns: '200px 1fr', minHeight: '100vh' },
+  fSidebar: { background: 'var(--bg)', borderRight: '1px solid var(--border)', padding: '40px 20px', height: '100vh', position: 'sticky', top: 0, overflow: 'hidden' },
   sbLogo:  { fontFamily: 'DM Mono, monospace', fontSize: 15, fontWeight: 500, color: 'var(--text)', marginBottom: 44 },
   sbStep:  { display: 'flex', alignItems: 'flex-start', gap: 12, padding: '12px 0' },
   sbNum:   { width: 28, height: 28, border: '1px solid', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'DM Mono, monospace', fontSize: 14, flexShrink: 0, transition: 'all 0.2s' },
   sbLabel: { fontSize: 15, fontWeight: 500, transition: 'color 0.2s' },
   sbSub:   { fontSize: 13, color: 'var(--muted)', marginTop: 2 },
-  fBody:   { padding: '64px 72px', display: 'flex', flexDirection: 'column', justifyContent: 'center', maxWidth: 720 },
+  fBody:   { padding: '48px 56px', display: 'flex', flexDirection: 'column', justifyContent: 'center', maxWidth: 900 },
   qNum:    { fontFamily: 'DM Mono, monospace', fontSize: 15, color: 'var(--muted)', marginBottom: 10 },
   qTitle:  { fontFamily: 'DM Serif Display, serif', fontSize: 'clamp(28px, 3.5vw, 44px)', fontWeight: 400, lineHeight: 1.15, color: 'var(--text)', marginBottom: 8 },
   qHint:   { fontSize: 16, color: 'var(--muted)', marginBottom: 16 },
   multiHint: { display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 14, color: 'var(--mid)', background: 'var(--bg)', border: '1px solid var(--border)', padding: '5px 12px', marginBottom: 24 },
-  catHeader: { fontFamily: 'DM Sans, sans-serif', fontSize: 13, fontWeight: 600, color: 'var(--muted)', letterSpacing: '0.06em', padding: '7px 0', borderBottom: '1px solid var(--border)', marginBottom: 10 },
-  optsGrid: { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 },
-  opt:     { padding: '16px 18px', border: '1px solid', background: 'var(--white)', cursor: 'pointer', textAlign: 'left', fontFamily: 'DM Sans, sans-serif', fontSize: 16, display: 'flex', alignItems: 'flex-start', gap: 12, lineHeight: 1.4, transition: 'all 0.15s', boxShadow: '0 1px 4px rgba(0,0,0,0.05)' },
+  catHeader: { fontFamily: 'DM Sans, sans-serif', fontSize: 12, fontWeight: 600, color: 'var(--muted)', letterSpacing: '0.06em', padding: '6px 0', borderBottom: '1px solid var(--border)', marginBottom: 8, textTransform: 'uppercase' },
+  optsGrid: { display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 8 },
+  opt:     { padding: '10px 12px', border: '1px solid', background: 'var(--white)', cursor: 'pointer', textAlign: 'left', fontFamily: 'DM Sans, sans-serif', fontSize: 14, display: 'flex', alignItems: 'flex-start', gap: 8, lineHeight: 1.35, transition: 'all 0.15s', boxShadow: '0 1px 3px rgba(0,0,0,0.04)' },
   fNav:    { display: 'flex', alignItems: 'center', justifyContent: 'space-between' },
   btnBack: { background: 'none', border: '1px solid var(--border)', color: 'var(--muted)', padding: '12px 24px', fontFamily: 'DM Sans, sans-serif', fontSize: 16, cursor: 'pointer' },
   btnNext: { background: 'var(--text)', color: '#fff', border: 'none', padding: '14px 36px', fontFamily: 'DM Sans, sans-serif', fontSize: 16, fontWeight: 500, cursor: 'pointer', transition: 'all 0.2s' },
