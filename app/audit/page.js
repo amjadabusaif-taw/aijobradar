@@ -475,7 +475,7 @@ export default function AuditPage() {
         {/* Mobile progress bar */}
         <div className="f-progress-bar" style={{ display: 'none', flexDirection: 'column', background: 'var(--bg)', borderBottom: '1px solid var(--border)', padding: '14px 20px', gap: 8, position: 'sticky', top: 0, zIndex: 10 }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <img src="/aijr-logo.png" alt="AI Job Radar" style={{ height: 24, width: 'auto', display: 'block' }} />
+            <img src="/aijr-logo.png" alt="AI Job Radar" style={{ height: 20, width: 'auto', display: 'block' }} />
             <div style={{ fontFamily: 'DM Mono, monospace', fontSize: 13, color: 'var(--muted)' }}>Step {step + 1} of {STEPS.length} — {STEPS[step].label}</div>
           </div>
           <div style={{ height: 3, background: 'var(--border)', borderRadius: 2, overflow: 'hidden' }}>
@@ -484,7 +484,7 @@ export default function AuditPage() {
         </div>
         {/* Sidebar */}
         <div className="f-sidebar" style={S.fSidebar}>
-          <img src="/aijr-logo.png" alt="AI Job Radar" style={{ height: 32, width: 'auto', display: 'block', marginBottom: 44 }} />
+          <img src="/aijr-logo.png" alt="AI Job Radar" style={{ height: 24, width: 'auto', display: 'block', marginBottom: 44 }} />
           {STEPS.map((st, i) => (
             <div key={st.id} style={{
               ...S.sbStep,
@@ -773,7 +773,7 @@ export default function AuditPage() {
 // ─── Logo component ───────────────────────────────────────────────────────────
 function Logo() {
   return (
-    <img src="/aijr-logo.png" alt="AI Job Radar" style={{ height: 40, width: 'auto', display: 'block' }} />
+    <img src="/aijr-logo.png" alt="AI Job Radar" style={{ height: 28, width: 'auto', display: 'block' }} />
   );
 }
 

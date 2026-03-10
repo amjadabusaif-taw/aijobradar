@@ -1,7 +1,6 @@
 import './globals.css';
 
 export const metadata = {
-  icons: { icon: '/favicon.png' },
   title: 'AIJobRadar — How close are you to being replaced by AI?',
   description: 'Get your personal AI Displacement Risk Score. Scored across 5 dimensions, benchmarked against your peers.',
   openGraph: {
