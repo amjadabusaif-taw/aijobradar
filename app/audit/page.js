@@ -475,7 +475,7 @@ export default function AuditPage() {
         {/* Mobile progress bar */}
         <div className="f-progress-bar" style={{ display: 'none', flexDirection: 'column', background: 'var(--bg)', borderBottom: '1px solid var(--border)', padding: '14px 20px', gap: 8, position: 'sticky', top: 0, zIndex: 10 }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <div style={{ fontFamily: 'DM Mono, monospace', fontSize: 14, color: 'var(--text)', fontWeight: 500 }}>AI<span style={{ color: 'var(--red)' }}>Job</span>Radar</div>
+            <img src="/aijr-logo.png" alt="AI Job Radar" style={{ height: 24, width: 'auto', display: 'block' }} />
             <div style={{ fontFamily: 'DM Mono, monospace', fontSize: 13, color: 'var(--muted)' }}>Step {step + 1} of {STEPS.length} — {STEPS[step].label}</div>
           </div>
           <div style={{ height: 3, background: 'var(--border)', borderRadius: 2, overflow: 'hidden' }}>
@@ -484,7 +484,7 @@ export default function AuditPage() {
         </div>
         {/* Sidebar */}
         <div className="f-sidebar" style={S.fSidebar}>
-          <div style={S.sbLogo}>AI<span style={{ color: 'var(--red)' }}>Job</span>Radar</div>
+          <img src="/aijr-logo.png" alt="AI Job Radar" style={{ height: 32, width: 'auto', display: 'block', marginBottom: 44 }} />
           {STEPS.map((st, i) => (
             <div key={st.id} style={{
               ...S.sbStep,
@@ -773,19 +773,7 @@ export default function AuditPage() {
 // ─── Logo component ───────────────────────────────────────────────────────────
 function Logo() {
   return (
-    <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-      <div style={{ width: 34, height: 34, background: 'var(--red)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-        <svg viewBox="0 0 16 16" fill="none" width="16" height="16">
-          <circle cx="8" cy="8" r="7" stroke="white" strokeWidth="1"/>
-          <circle cx="8" cy="8" r="3.5" stroke="white" strokeWidth="1" opacity="0.5"/>
-          <line x1="8" y1="8" x2="14" y2="4.5" stroke="white" strokeWidth="1.5"/>
-          <circle cx="8" cy="8" r="1.2" fill="white"/>
-        </svg>
-      </div>
-      <div style={{ fontFamily: 'DM Mono, monospace', fontSize: 16, fontWeight: 500, color: 'var(--text)' }}>
-        AI<span style={{ color: 'var(--red)' }}>Job</span>Radar
-      </div>
-    </div>
+    <img src="/aijr-logo.png" alt="AI Job Radar" style={{ height: 40, width: 'auto', display: 'block' }} />
   );
 }
 
