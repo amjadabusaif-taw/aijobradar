@@ -109,11 +109,24 @@ export async function POST(request) {
           <table width="100%" cellpadding="0" cellspacing="0">${actionsHtml}</table>
         </td></tr>
 
-        <!-- CTA -->
-        <tr><td style="padding:32px 40px;text-align:center;background:#f2eeea;">
-          <div style="font-family:Georgia,serif;font-size:24px;color:#2c2825;margin-bottom:10px;">Stay ahead of the radar.</div>
-          <p style="font-size:15px;color:#6b6460;margin:0 0 24px;">Pro members get monthly AI threat briefings, score tracking, and a living career dossier.</p>
-          <a href="https://aijobradar.app" style="display:inline-block;padding:14px 36px;background:#c0392b;color:#ffffff;text-decoration:none;font-size:16px;font-weight:500;">Upgrade to Pro</a>
+        <!-- Recommendations -->
+        <tr><td style="padding:32px 40px;background:#f2eeea;border-bottom:1px solid #e2ddd7;">
+          <div style="font-size:14px;font-weight:600;color:#a09a95;margin-bottom:16px;">Recommended For Your Results</div>
+          ${(d.recommendations || []).map((rec, i) => `
+            <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:10px;">
+              <tr><td style="padding:18px 20px;background:${i === 0 ? '#fdf1f0' : '#ffffff'};border:1px solid ${i === 0 ? '#f5c5c0' : '#e2ddd7'};">
+                <div style="font-family:monospace;font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:${i === 0 ? '#c0392b' : '#a09a95'};margin-bottom:6px;">${rec.tag}</div>
+                <div style="font-family:Georgia,serif;font-size:18px;color:#2c2825;margin-bottom:4px;">${rec.title}</div>
+                <div style="font-size:12px;color:#a09a95;font-style:italic;margin-bottom:8px;">${rec.subtitle}</div>
+                <p style="font-size:13px;color:#6b6460;line-height:1.6;margin:0 0 10px;">${rec.desc}</p>
+                <div style="font-family:monospace;font-size:11px;color:#a09a95;margin-bottom:12px;">${rec.reason}</div>
+                ${rec.coming
+                  ? '<span style="display:inline-block;padding:8px 20px;background:#e2ddd7;color:#a09a95;font-size:13px;font-weight:500;">Coming Soon</span>'
+                  : `<a href="${rec.url}" style="display:inline-block;padding:8px 20px;background:${i === 0 ? '#c0392b' : '#2c2825'};color:#ffffff;text-decoration:none;font-size:13px;font-weight:500;">Get This Guide \u2192</a>`
+                }
+              </td></tr>
+            </table>
+          `).join('')}
         </td></tr>
 
         <!-- Footer -->
