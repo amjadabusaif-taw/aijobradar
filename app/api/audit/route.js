@@ -128,7 +128,7 @@ export async function POST(request) {
 </html>`;
 
         await resend.emails.send({
-          from:    'AIJobRadar <radar@onlyscrollclub.com>',
+          from:    'AI Job Radar <radar@onlyscrollclub.com>',
           to:      [email],
           subject: `Your AI Displacement Report — ${d.risk} Risk · Score ${d.overall}/100`,
           html,

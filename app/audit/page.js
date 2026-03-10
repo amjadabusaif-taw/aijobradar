@@ -216,7 +216,7 @@ function buildResults(ans) {
       : 'The gap between knowing you need to adapt and actually adapting is where careers quietly end.',
     actions: [
       { n: 1, time: 'Next 7 days',  impact: 'HIGH',   dim: 'Task Automation Exposure',  text: `Audit your current role. List every recurring task and identify which ones an AI tool can already perform. This is your personal threat map — it will make every other action more targeted.` },
-      { n: 2, time: 'Next 30 days', impact: 'HIGH',   dim: 'Adaptability Velocity',      text: `Deploy one AI tool directly in your workflow — Copilot, Notion AI, or an equivalent for ${industry}. Use it daily until it becomes invisible. Passive awareness of AI tools counts for nothing.` },
+      { n: 2, time: 'Next 30 days', impact: 'HIGH',   dim: 'Adaptability Velocity',      text: `Deploy one AI productivity tool directly in your daily workflow and use it every day until it becomes second nature. Passive awareness of what is available counts for nothing — active use is what changes your exposure score.` },
       { n: 3, time: 'Next 30 days', impact: 'HIGH',   dim: 'Human Irreplaceability',     text: `Identify the three decisions in your role that require human judgment and make those your visible speciality. Document them and present them to leadership — your irreplaceability must be visible to count.` },
       { n: 4, time: 'Next 60 days', impact: 'MEDIUM', dim: 'Adaptability Velocity',      text: `Research one AI certification relevant to your role and enrol. Your CV needs a visible signal that you are not standing still — especially relevant given your concern about ${fearsSalary ? 'salary compression' : fearsOutpaced ? 'being outpaced by peers' : 'skill obsolescence'}.` },
       { n: 5, time: 'Next 90 days', impact: 'MEDIUM', dim: 'Strategic Pivot Readiness',  text: `Map two adjacent roles that are more AI-resistant and that your skills transfer to. Keep them as live options. ${pivoting ? 'You are already thinking about this — now make it concrete with names, companies, and required skill gaps.' : 'Having no exit plan is a risk multiplier for everything else.'}` },
@@ -261,12 +261,6 @@ export default function AuditPage() {
           clearInterval(t);
           const data = buildResults(ans);
           setResults(data);
-          // Save to Supabase + send email (fire and forget, no email gate)
-          fetch('/api/audit', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ answers: ans, results: data }),
-          }).catch(() => {});
           setTimeout(() => setScreen('results'), 600);
         }
       }, 900);
@@ -617,31 +611,12 @@ export default function AuditPage() {
           })}
         </div>
 
-        {/* Action plan */}
-        <div style={S.secLabel}>Your 90-Day Action Plan</div>
-        <div style={{ marginBottom: 48 }}>
-          {d.actions.map(a => (
-            <div key={a.n} style={S.actItem}>
-              <div style={S.actNum}>0{a.n}</div>
-              <div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap', marginBottom: 8 }}>
-                  <span style={S.actTime}>{a.time}</span>
-                  <span style={{
-                    ...S.actImpact,
-                    ...(a.impact === 'HIGH' ? { borderColor: 'var(--red-border)', color: 'var(--red)', background: 'var(--red-bg)' } : {}),
-                  }}>{a.impact} impact</span>
-                </div>
-                <p style={S.actText}>{a.text}</p>
-                <div style={S.actDim}>Dimension: {a.dim}</div>
-              </div>
-            </div>
-          ))}
-        </div>
+
 
         {/* Email capture */}
         <div style={S.emailBox}>
-          <div style={S.emailTitle}>Get your full report by email</div>
-          <p style={S.emailSub}>We will send you a complete copy of this report with your scores and action plan — keep it, share it, come back to it.</p>
+          <div style={S.emailTitle}>Your 90-day action plan is ready</div>
+          <p style={S.emailSub}>Enter your email to unlock all 5 steps — including your highest-impact action for {d.role.toLowerCase()} roles in {d.industry}.</p>
           {emailSent ? (
             <div style={S.emailSuccess}>Report sent. Check your inbox.</div>
           ) : (
