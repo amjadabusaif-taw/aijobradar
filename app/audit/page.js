@@ -311,8 +311,17 @@ function buildResults(ans) {
     },
   ];
 
-  const overall = Math.round(dims.map(d => d.score).reduce((a, b) => a + b, 0) / dims.length);
-  const risk    = overall >= 65 ? 'HIGH' : overall >= 48 ? 'MEDIUM' : 'LOW';
+  // For the overall risk score, all dimensions must point the same direction (high = more risk).
+  // Automation and Economic are already "high = bad". Irreplaceability, Adaptability, and Pivot
+  // are "high = good", so we invert them for the average.
+  const riskScores = dims.map(d => {
+    if (['Human Irreplaceability', 'Adaptability Velocity', 'Strategic Pivot Readiness'].includes(d.name)) {
+      return 100 - d.score; // invert: low irreplaceability/adaptability/pivot = high risk
+    }
+    return d.score; // high automation/economic = high risk
+  });
+  const overall = Math.round(riskScores.reduce((a, b) => a + b, 0) / riskScores.length);
+  const risk    = overall >= 65 ? 'HIGH' : overall >= 45 ? 'MEDIUM' : 'LOW';
 
   // Clean summary paragraph
   const expLabel = exp.toLowerCase().replace('under ', 'less than ');
