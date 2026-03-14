@@ -882,10 +882,12 @@ export default function AuditPage() {
             .rec-btn-row { display: flex; align-items: center; gap: 12px; margin-top: 12px; }
             @media (max-width: 640px) {
               .rec-primary { flex-direction: column; }
-              .rec-primary-img { width: 100%; min-height: 0; height: 220px; }
+              .rec-primary-img { width: 100%; min-height: 0; height: auto; max-height: 320px; }
+              .rec-primary-img img { width: 100%; height: auto; max-height: 320px; object-fit: contain; object-position: top; }
               .rec-primary-body { padding: 18px 16px; }
               .rec-secondary { flex-direction: column; align-items: stretch; gap: 0; }
-              .rec-secondary-img { width: 100%; height: 180px; border-radius: 0; }
+              .rec-secondary-img { width: 100%; height: auto; max-height: 260px; border-radius: 0; }
+              .rec-secondary-img img { width: 100%; height: auto; max-height: 260px; object-fit: contain; object-position: top; }
               .rec-secondary-body { padding: 16px; }
               .rec-btn-row { flex-direction: column; align-items: stretch; }
             }
@@ -1015,9 +1017,12 @@ export default function AuditPage() {
               </div>
             );
           })}
-          <div style={{ textAlign: 'center', marginTop: 16 }}>
-            <a href="/guides" style={{ fontSize: 14, color: 'var(--red)', textDecoration: 'none', fontWeight: 500 }}>
-              Browse all 9 guides →
+          <div style={{ textAlign: 'center', marginTop: 20, marginBottom: 8 }}>
+            <a href="/guides" style={{
+              display: 'inline-block', fontSize: 16, color: '#fff', textDecoration: 'none', fontWeight: 600,
+              background: 'var(--text)', padding: '14px 36px', letterSpacing: '0.02em',
+            }}>
+              Browse All 9 Guides →
             </a>
           </div>
         </div>
