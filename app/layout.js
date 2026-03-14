@@ -21,6 +21,7 @@ export default function RootLayout({ children }) {
           href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:wght@400&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap"
           rel="stylesheet"
         />
+        <script src="https://gumroad.com/js/gumroad.js" async />
       </head>
       <body>{children}</body>
     </html>

@@ -14,85 +14,94 @@ export const PRODUCTS = {
   universalGuide: {
     id: 'universalGuide',
     title: 'AI-Proof Your Career',
-    subtitle: 'The Displacement Defence Field Guide',
-    url: `${GUMROAD}/ai-proof-your-career`,
+    subtitle: 'The Universal AI Displacement Guide',
+    url: `${GUMROAD}/ai-proof-career`,
     tag: 'DEFENCE MANUAL',
     desc: 'A structured action plan built around the same 5 dimensions your radar scan just measured. Every chapter maps to a score.',
-    coming: true,
+    cover: '/covers/cover-1.jpg',
+    thumb: '/thumbs/thumb-1.jpg',
   },
 
-  // ── ROLE CLUSTER GUIDES (Tier 2 — new guides) ──
+  // ── ROLE CLUSTER GUIDES (Tier 2) ──
   clientFacing: {
     id: 'clientFacing',
-    title: 'The Client-Facing Professional\'s AI Survival Guide',
-    subtitle: 'Protecting Relationship-Based Roles',
-    url: `${GUMROAD}/client-facing-ai-survival`,
+    title: 'The Client-Facing AI Survival Guide',
+    subtitle: 'When the chatbot handles the easy ones, you handle the ones that matter.',
+    url: `${GUMROAD}/client-facing`,
     tag: 'FOR YOUR ROLE',
     desc: 'How to shift from transactional service to strategic relationship ownership before AI absorbs the rest.',
-    coming: true,
+    cover: '/covers/cover-2.jpg',
+    thumb: '/thumbs/thumb-2.jpg',
   },
   aiInFinance: {
     id: 'aiInFinance',
-    title: 'AI in Finance',
-    subtitle: 'Protecting Your Career in an Automated Industry',
-    url: `${GUMROAD}/ai-in-finance`,
+    title: "The Finance Professional's AI Displacement Guide",
+    subtitle: 'When the numbers start running themselves.',
+    url: `${GUMROAD}/finance-displacement`,
     tag: 'FOR YOUR ROLE',
-    desc: 'From producing financial analysis to interpreting it. How to use regulation as a window, not a wall.',
-    coming: true,
+    desc: 'Move from calculation to judgment — the advisory skill, strategic interpretation, and client trust that AI cannot replicate.',
+    cover: '/covers/cover-6.jpg',
+    thumb: '/thumbs/thumb-6.jpg',
   },
   creativePlaybook: {
     id: 'creativePlaybook',
-    title: 'The Creative Professional\'s AI Playbook',
-    subtitle: 'Thriving When AI Produces What You Produce',
-    url: `${GUMROAD}/creative-ai-playbook`,
+    title: "The Creative Professional's AI Playbook",
+    subtitle: 'When the machine can make it, your job is to mean it.',
+    url: `${GUMROAD}/creative-playbook`,
     tag: 'FOR YOUR ROLE',
     desc: 'When output is no longer scarce, your value shifts to direction, curation, and original perspective.',
-    coming: true,
+    cover: '/covers/cover-3.jpg',
+    thumb: '/thumbs/thumb-3.jpg',
   },
   educationGuide: {
     id: 'educationGuide',
     title: 'AI-Proofing Education',
-    subtitle: 'For Teachers, Trainers, and Academics',
-    url: `${GUMROAD}/ai-proofing-education`,
+    subtitle: "When the lesson plans write themselves, your job is to teach what they can't.",
+    url: `${GUMROAD}/education-ai-proof`,
     tag: 'FOR YOUR ROLE',
     desc: 'Offload the automatable to focus on the irreplaceable — mentorship, inspiration, and genuine understanding.',
-    coming: true,
+    cover: '/covers/cover-4.jpg',
+    thumb: '/thumbs/thumb-4.jpg',
   },
   technicalGuide: {
     id: 'technicalGuide',
-    title: 'The Technical Professional\'s AI Displacement Guide',
-    subtitle: 'When the Builders Get Built For',
-    url: `${GUMROAD}/technical-ai-displacement`,
+    title: "The Technical Professional's AI Displacement Guide",
+    subtitle: 'When the builders get built for.',
+    url: `${GUMROAD}/technical-displacement`,
     tag: 'FOR YOUR ROLE',
     desc: 'From code production to system design. How to stay ahead when AI writes the code you used to write.',
-    coming: true,
+    cover: '/covers/cover-5.jpg',
+    thumb: '/thumbs/thumb-5.jpg',
   },
   healthcarePublic: {
     id: 'healthcarePublic',
-    title: 'AI in Healthcare and Public Service',
-    subtitle: 'Career Resilience for Regulated Industries',
-    url: `${GUMROAD}/ai-healthcare-public-service`,
+    title: 'The Healthcare & Public Sector AI Displacement Guide',
+    subtitle: 'When the system starts thinking for itself.',
+    url: `${GUMROAD}/healthcare-public-sector`,
     tag: 'FOR YOUR ROLE',
-    desc: 'Regulation gives you a window other sectors don\'t have. This guide shows you what to do with it.',
-    coming: true,
+    desc: 'Move from process to service — the human judgment, stakeholder leadership, and service design these sectors demand.',
+    cover: '/covers/cover-8.jpg',
+    thumb: '/thumbs/thumb-8.jpg',
   },
   builtEnvironment: {
     id: 'builtEnvironment',
-    title: 'AI and the Built Environment',
-    subtitle: 'Career Defence for Construction and Property',
-    url: `${GUMROAD}/ai-built-environment`,
+    title: 'The Built Environment AI Displacement Guide',
+    subtitle: 'When the blueprints draw themselves.',
+    url: `${GUMROAD}/built-environment`,
     tag: 'FOR YOUR ROLE',
     desc: 'The site stays human. The office, the estimate, and the transaction do not. How to stay on the right side.',
-    coming: true,
+    cover: '/covers/cover-9.jpg',
+    thumb: '/thumbs/thumb-9.jpg',
   },
   legalGuide: {
     id: 'legalGuide',
-    title: 'The Legal Professional\'s AI Readiness Guide',
-    subtitle: 'When AI Reads Faster Than You',
-    url: `${GUMROAD}/legal-ai-readiness`,
+    title: "The Legal Professional's AI Displacement Guide",
+    subtitle: 'When the fine print reads itself.',
+    url: `${GUMROAD}/legal-displacement`,
     tag: 'FOR YOUR ROLE',
-    desc: 'Legal AI replaces legal work, not lawyers. Your career depends on which side of that line your daily work falls.',
-    coming: true,
+    desc: 'Move from process to judgment — the client counsel, negotiation, and strategic advisory that AI cannot provide.',
+    cover: '/covers/cover-7.jpg',
+    thumb: '/thumbs/thumb-7.jpg',
   },
 
   // ── EXISTING ROLE-SPECIFIC (PM, BA, HR) ──
@@ -179,7 +188,7 @@ export const PRODUCTS = {
     desc: 'Build a digital product income stream as career insurance — without the constant self-promotion.',
   },
 
-  // ── TECH TACTICAL (pair with technical guide) ──
+  // ── TECH TACTICAL ──
   gitGithub: {
     id: 'gitGithub',
     title: 'Git & GitHub Complete Workflow Guide',
@@ -208,73 +217,47 @@ export const PRODUCTS = {
 
 
 // ── ROLE → PRODUCT MAPPING ───────────────────────────────────────────────────
-// Maps each selectable role to its Slot 1 (role-specific) product
 
 const ROLE_MAP = {
-  // Business and Management
   'Project and Programme Manager':   'completeChampion',
   'Business Analyst':                'businessAnalyst',
-  'Operations Manager':              'universalGuide',      // no cluster yet, fallback
-  'Team Lead and Manager':           'universalGuide',      // no cluster yet, fallback
-
-  // Construction and Real Estate
+  'Operations Manager':              'universalGuide',
+  'Team Lead and Manager':           'universalGuide',
   'Site and Project Engineer':       'builtEnvironment',
   'Quantity Surveyor':               'builtEnvironment',
   'Property and Real Estate Agent':  'builtEnvironment',
-
-  // Customer and Client Services
   'Customer Success':                'clientFacing',
   'Customer Support':                'clientFacing',
   'Account Manager':                 'clientFacing',
-
-  // Education
   'Teacher, Tutor and Trainer':      'educationGuide',
   'Academic Researcher':             'educationGuide',
   'Education Administrator':         'educationGuide',
-
-  // Finance and Banking
   'Financial Analyst and Advisor':   'aiInFinance',
   'Risk and Compliance Officer':     'aiInFinance',
   'Accountant and Auditor':          'aiInFinance',
   'Fintech Specialist':              'aiInFinance',
-
-  // Healthcare
   'Clinical and Medical Staff':      'healthcarePublic',
   'Healthcare Administrator':        'healthcarePublic',
   'Pharmacist and Lab Specialist':   'healthcarePublic',
-
-  // HR and People
   'HR and People Ops':               'hrFundamentals',
-  'Talent Acquisition Specialist':   'clientFacing',        // recruitment is client-facing
-  'Learning and Development':        'educationGuide',      // L&D maps to education cluster
-
-  // Legal
+  'Talent Acquisition Specialist':   'clientFacing',
+  'Learning and Development':        'educationGuide',
   'Legal Counsel and Advisor':       'legalGuide',
   'Paralegal and Legal Support':     'legalGuide',
   'Compliance and Regulatory Officer': 'legalGuide',
-
-  // Manufacturing and Logistics
-  'Supply Chain Coordinator':        'universalGuide',      // no cluster yet
+  'Supply Chain Coordinator':        'universalGuide',
   'Production Supervisor':           'universalGuide',
   'Quality and Safety Inspector':    'universalGuide',
-
-  // Media and Publishing
   'Content Creator and Journalist':  'creativePlaybook',
   'Video and Audio Producer':        'creativePlaybook',
   'Social Media Specialist':         'creativePlaybook',
   'Copywriter and Editor':           'creativePlaybook',
-
-  // Public Sector
   'Policy and Regulatory Officer':   'healthcarePublic',
   'Civil Servant and Administrator': 'healthcarePublic',
   'Public Health and Social Worker': 'healthcarePublic',
-
-  // Sales and Marketing
   'Sales Professional':              'clientFacing',
   'Marketing Specialist':            'creativePlaybook',
   'E-commerce and Merchandising':    'clientFacing',
-
-  // Technology
   'Software Developer':              'technicalGuide',
   'IT and Systems Administrator':    'technicalGuide',
   'Data Analyst and Engineer':       'technicalGuide',
@@ -283,7 +266,6 @@ const ROLE_MAP = {
 
 
 // ── DIMENSION → PRODUCT MAPPING ──────────────────────────────────────────────
-// Maps each dimension to the best existing product for Slot 2
 
 const DIM_MAP = {
   'Task Automation Exposure':    ['aiVideoPrompt', 'aiImagePrompt', 'digitalLiteracy'],
@@ -293,7 +275,6 @@ const DIM_MAP = {
   'Strategic Pivot Readiness':   ['personalBranding', 'personalBrandBundle', 'salaryNegotiation', 'sellMoreSocializeLess'],
 };
 
-// For tech roles, prefer tech-specific dimension products
 const TECH_DIM_MAP = {
   'Task Automation Exposure':    ['gitGithub', 'docker', 'aiVideoPrompt'],
   'Human Irreplaceability':      ['communicationPlus', 'personalBranding'],
@@ -322,8 +303,7 @@ export function getRecommendations(role, dims) {
     usedIds.add(roleProductId);
   }
 
-  // Slot 2: Dimension-specific product (weakest dimension, excluding automation exposure if role guide already covers it)
-  // Find the dimension with the lowest score (most at risk)
+  // Slot 2: Dimension-specific product (weakest dimension)
   const sortedDims = [...dims].sort((a, b) => a.score - b.score);
   const isTech = TECH_ROLES.includes(role);
   const dimMap = isTech ? TECH_DIM_MAP : DIM_MAP;
@@ -349,7 +329,7 @@ export function getRecommendations(role, dims) {
     if (dimProduct) break;
   }
 
-  // Slot 3: Universal guide (always, unless it was already used as Slot 1)
+  // Slot 3: Universal guide (always, unless already used as Slot 1)
   if (!usedIds.has('universalGuide')) {
     recs.push({
       ...PRODUCTS.universalGuide,
