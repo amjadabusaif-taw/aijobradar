@@ -926,7 +926,7 @@ export default function AuditPage() {
                         <div style={{ fontSize: 11, color: 'var(--muted)', fontFamily: 'DM Mono, monospace', marginBottom: 14 }}>
                           {rec.reason}
                         </div>
-                        <a href={rec.url} className="gumroad-button" style={{
+                        <a href={rec.url} className="gumroad-button" target="_blank" rel="noopener" style={{
                           display: 'inline-flex', alignItems: 'center', alignSelf: 'flex-start',
                           padding: '10px 24px', textDecoration: 'none',
                           fontFamily: 'DM Sans, sans-serif', fontSize: 14, fontWeight: 500,
@@ -954,7 +954,7 @@ export default function AuditPage() {
                       <div style={{ fontSize: 11, color: 'var(--muted)', fontFamily: 'DM Mono, monospace', marginBottom: 14 }}>
                         {rec.reason}
                       </div>
-                      <a href={rec.url} className="gumroad-button" style={{
+                      <a href={rec.url} className="gumroad-button" target="_blank" rel="noopener" style={{
                         display: 'inline-flex', alignItems: 'center',
                         padding: '10px 24px', textDecoration: 'none',
                         fontFamily: 'DM Sans, sans-serif', fontSize: 14, fontWeight: 500,
@@ -999,7 +999,7 @@ export default function AuditPage() {
                       <div style={{ fontSize: 11, color: 'var(--muted)', fontFamily: 'DM Mono, monospace' }}>
                         {rec.reason}
                       </div>
-                      <a href={rec.url} className="gumroad-button" style={{
+                      <a href={rec.url} className="gumroad-button" target="_blank" rel="noopener" style={{
                         display: 'inline-flex', alignItems: 'center',
                         padding: '9px 18px', textDecoration: 'none', whiteSpace: 'nowrap', flexShrink: 0,
                         fontFamily: 'DM Sans, sans-serif', fontSize: 13, fontWeight: 500,
