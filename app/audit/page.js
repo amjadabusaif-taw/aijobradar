@@ -872,23 +872,19 @@ export default function AuditPage() {
         <div style={{ marginBottom: 24 }}>
           <style>{`
             .rec-primary { display: flex; flex-direction: row; gap: 0; }
-            .rec-primary-img { width: 200px; min-height: 260px; flex-shrink: 0; background: #0a0a0c; }
+            .rec-primary-img { width: 200px; flex-shrink: 0; overflow: hidden; }
             .rec-primary-img img { width: 100%; height: 100%; object-fit: cover; display: block; }
             .rec-primary-body { flex: 1; padding: 22px 24px; display: flex; flex-direction: column; justify-content: center; }
             .rec-secondary { display: flex; align-items: center; gap: 16px; }
-            .rec-secondary-img { width: 100px; height: 100px; flex-shrink: 0; border-radius: 6px; overflow: hidden; background: #0a0a0c; }
+            .rec-secondary-img { width: 100px; height: 100px; flex-shrink: 0; border-radius: 6px; overflow: hidden; }
             .rec-secondary-img img { width: 100%; height: 100%; object-fit: cover; display: block; }
             .rec-secondary-body { flex: 1; min-width: 0; }
             .rec-btn-row { display: flex; align-items: center; gap: 12px; margin-top: 12px; }
             @media (max-width: 640px) {
-              .rec-primary { flex-direction: column; }
-              .rec-primary-img { width: 100%; min-height: 0; height: auto; max-height: 320px; }
-              .rec-primary-img img { width: 100%; height: auto; max-height: 320px; object-fit: contain; object-position: top; }
-              .rec-primary-body { padding: 18px 16px; }
-              .rec-secondary { flex-direction: column; align-items: stretch; gap: 0; }
-              .rec-secondary-img { width: 100%; height: auto; max-height: 260px; border-radius: 0; }
-              .rec-secondary-img img { width: 100%; height: auto; max-height: 260px; object-fit: contain; object-position: top; }
-              .rec-secondary-body { padding: 16px; }
+              .rec-primary, .rec-secondary { flex-direction: column; align-items: stretch; gap: 0; }
+              .rec-primary-img, .rec-secondary-img { width: 100%; height: auto; border-radius: 0; }
+              .rec-primary-img img, .rec-secondary-img img { width: 100%; height: auto; object-fit: contain; }
+              .rec-primary-body, .rec-secondary-body { padding: 18px 16px; }
               .rec-btn-row { flex-direction: column; align-items: stretch; }
             }
           `}</style>
