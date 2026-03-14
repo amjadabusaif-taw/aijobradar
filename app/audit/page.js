@@ -870,95 +870,151 @@ export default function AuditPage() {
 
         {/* Product Recommendations */}
         <div style={{ marginBottom: 24 }}>
+          <style>{`
+            .rec-primary { display: flex; flex-direction: row; gap: 0; }
+            .rec-primary-img { width: 200px; min-height: 260px; flex-shrink: 0; background: #0a0a0c; }
+            .rec-primary-img img { width: 100%; height: 100%; object-fit: cover; display: block; }
+            .rec-primary-body { flex: 1; padding: 22px 24px; display: flex; flex-direction: column; justify-content: center; }
+            .rec-secondary { display: flex; align-items: center; gap: 16px; }
+            .rec-secondary-img { width: 100px; height: 100px; flex-shrink: 0; border-radius: 6px; overflow: hidden; background: #0a0a0c; }
+            .rec-secondary-img img { width: 100%; height: 100%; object-fit: cover; display: block; }
+            .rec-secondary-body { flex: 1; min-width: 0; }
+            .rec-btn-row { display: flex; align-items: center; gap: 12px; margin-top: 12px; }
+            @media (max-width: 640px) {
+              .rec-primary { flex-direction: column; }
+              .rec-primary-img { width: 100%; min-height: 0; height: 220px; }
+              .rec-primary-body { padding: 18px 16px; }
+              .rec-secondary { flex-direction: column; align-items: stretch; gap: 0; }
+              .rec-secondary-img { width: 100%; height: 180px; border-radius: 0; }
+              .rec-secondary-body { padding: 16px; }
+              .rec-btn-row { flex-direction: column; align-items: stretch; }
+            }
+          `}</style>
           <div style={S.secLabel}>Recommended For Your Results</div>
           <p style={{ fontSize: 15, color: 'var(--muted)', marginBottom: 20, lineHeight: 1.65 }}>
             Based on your role, industry, and dimension scores, these resources address your specific displacement risks.
           </p>
-          {d.recommendations && d.recommendations.map((rec, i) => (
-            <div key={rec.id || i} style={{
-              border: i === 0 ? '1px solid var(--red)' : '1px solid var(--border)',
-              background: i === 0 ? 'var(--red-bg)' : 'var(--white)',
-              padding: i === 0 ? 0 : '22px 24px',
-              marginBottom: 10,
-              overflow: 'hidden',
-            }}>
-              {/* Primary recommendation: large cover image layout */}
-              {i === 0 && rec.cover ? (
-                <div style={{ display: 'flex', gap: 0 }}>
-                  <div style={{ width: 180, minHeight: 240, flexShrink: 0, background: '#0a0a0c' }}>
-                    <img src={rec.cover} alt={rec.title} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
-                  </div>
-                  <div style={{ flex: 1, padding: '22px 24px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-                    <div style={{ fontFamily: 'DM Mono, monospace', fontSize: 10, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--red)', marginBottom: 6 }}>
-                      {rec.tag}
+          {d.recommendations && d.recommendations.map((rec, i) => {
+            const isPrimary = i === 0;
+            const hasImage = !!(rec.cover || rec.thumb);
+
+            // ── PRIMARY RECOMMENDATION (Slot 1) ──
+            if (isPrimary) {
+              return (
+                <div key={rec.id || i} style={{
+                  border: '1px solid var(--red)',
+                  background: 'var(--red-bg)',
+                  marginBottom: 12,
+                  overflow: 'hidden',
+                }}>
+                  {rec.cover ? (
+                    <div className="rec-primary">
+                      <div className="rec-primary-img">
+                        <img src={rec.cover} alt={rec.title} />
+                      </div>
+                      <div className="rec-primary-body">
+                        <div style={{ fontFamily: 'DM Mono, monospace', fontSize: 10, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--red)', marginBottom: 6 }}>
+                          {rec.tag}
+                        </div>
+                        <div style={{ fontFamily: 'DM Serif Display, serif', fontSize: 20, color: 'var(--text)', marginBottom: 4, lineHeight: 1.25 }}>
+                          {rec.title}
+                        </div>
+                        <div style={{ fontSize: 13, color: 'var(--muted)', marginBottom: 8, fontStyle: 'italic' }}>
+                          {rec.subtitle}
+                        </div>
+                        <p style={{ fontSize: 14, color: 'var(--mid)', lineHeight: 1.6, marginBottom: 8 }}>
+                          {rec.desc}
+                        </p>
+                        <div style={{ fontSize: 11, color: 'var(--muted)', fontFamily: 'DM Mono, monospace', marginBottom: 14 }}>
+                          {rec.reason}
+                        </div>
+                        <a href={rec.url} className="gumroad-button" style={{
+                          display: 'inline-flex', alignItems: 'center', alignSelf: 'flex-start',
+                          padding: '10px 24px', textDecoration: 'none',
+                          fontFamily: 'DM Sans, sans-serif', fontSize: 14, fontWeight: 500,
+                          background: 'var(--red)', color: '#fff', border: 'none', cursor: 'pointer',
+                        }}>
+                          Get This Guide →
+                        </a>
+                      </div>
                     </div>
-                    <div style={{ fontFamily: 'DM Serif Display, serif', fontSize: 20, color: 'var(--text)', marginBottom: 4, lineHeight: 1.25 }}>
-                      {rec.title}
-                    </div>
-                    <div style={{ fontSize: 13, color: 'var(--muted)', marginBottom: 8, fontStyle: 'italic' }}>
-                      {rec.subtitle}
-                    </div>
-                    <p style={{ fontSize: 14, color: 'var(--mid)', lineHeight: 1.6, marginBottom: 10 }}>
-                      {rec.desc}
-                    </p>
-                    <div style={{ fontSize: 12, color: 'var(--muted)', fontFamily: 'DM Mono, monospace', marginBottom: 14 }}>
-                      {rec.reason}
-                    </div>
-                    <a
-                      href={rec.url}
-                      className="gumroad-button"
-                      style={{
-                        display: 'inline-flex', alignItems: 'center', alignSelf: 'flex-start',
+                  ) : (
+                    /* Primary without cover image — text-only with strong treatment */
+                    <div style={{ padding: '22px 24px' }}>
+                      <div style={{ fontFamily: 'DM Mono, monospace', fontSize: 10, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--red)', marginBottom: 6 }}>
+                        {rec.tag}
+                      </div>
+                      <div style={{ fontFamily: 'DM Serif Display, serif', fontSize: 22, color: 'var(--text)', marginBottom: 4, lineHeight: 1.25 }}>
+                        {rec.title}
+                      </div>
+                      <div style={{ fontSize: 13, color: 'var(--muted)', marginBottom: 8, fontStyle: 'italic' }}>
+                        {rec.subtitle}
+                      </div>
+                      <p style={{ fontSize: 14, color: 'var(--mid)', lineHeight: 1.6, marginBottom: 8 }}>
+                        {rec.desc}
+                      </p>
+                      <div style={{ fontSize: 11, color: 'var(--muted)', fontFamily: 'DM Mono, monospace', marginBottom: 14 }}>
+                        {rec.reason}
+                      </div>
+                      <a href={rec.url} className="gumroad-button" style={{
+                        display: 'inline-flex', alignItems: 'center',
                         padding: '10px 24px', textDecoration: 'none',
                         fontFamily: 'DM Sans, sans-serif', fontSize: 14, fontWeight: 500,
                         background: 'var(--red)', color: '#fff', border: 'none', cursor: 'pointer',
-                      }}
-                    >
-                      Get This Guide →
-                    </a>
-                  </div>
-                </div>
-              ) : (
-                /* Secondary/tertiary recommendations: compact with optional thumb */
-                <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 16 }}>
-                  {rec.thumb && (
-                    <div style={{ width: 64, height: 64, flexShrink: 0, borderRadius: 4, overflow: 'hidden', background: '#0a0a0c' }}>
-                      <img src={rec.thumb} alt={rec.title} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+                      }}>
+                        Get This Guide →
+                      </a>
                     </div>
                   )}
-                  <div style={{ flex: 1 }}>
-                    <div style={{ fontFamily: 'DM Mono, monospace', fontSize: 10, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--muted)', marginBottom: 6 }}>
+                </div>
+              );
+            }
+
+            // ── SECONDARY RECOMMENDATIONS (Slots 2–3) ──
+            return (
+              <div key={rec.id || i} style={{
+                border: '1px solid var(--border)',
+                background: 'var(--white)',
+                marginBottom: 10,
+                overflow: 'hidden',
+              }}>
+                <div className="rec-secondary">
+                  {(rec.cover || rec.thumb) && (
+                    <div className="rec-secondary-img">
+                      <img src={rec.cover || rec.thumb} alt={rec.title} />
+                    </div>
+                  )}
+                  <div className="rec-secondary-body">
+                    <div style={{ fontFamily: 'DM Mono, monospace', fontSize: 10, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--muted)', marginBottom: 5 }}>
                       {rec.tag}
                     </div>
-                    <div style={{ fontFamily: 'DM Serif Display, serif', fontSize: 20, color: 'var(--text)', marginBottom: 4, lineHeight: 1.25 }}>
+                    <div style={{ fontFamily: 'DM Serif Display, serif', fontSize: 18, color: 'var(--text)', marginBottom: 3, lineHeight: 1.25 }}>
                       {rec.title}
                     </div>
-                    <div style={{ fontSize: 13, color: 'var(--muted)', marginBottom: 8, fontStyle: 'italic' }}>
+                    <div style={{ fontSize: 13, color: 'var(--muted)', marginBottom: 6, fontStyle: 'italic' }}>
                       {rec.subtitle}
                     </div>
-                    <p style={{ fontSize: 14, color: 'var(--mid)', lineHeight: 1.6, marginBottom: 10 }}>
+                    <p style={{ fontSize: 13, color: 'var(--mid)', lineHeight: 1.55, marginBottom: 0 }}>
                       {rec.desc}
                     </p>
-                    <div style={{ fontSize: 12, color: 'var(--muted)', fontFamily: 'DM Mono, monospace' }}>
-                      {rec.reason}
+                    <div className="rec-btn-row">
+                      <div style={{ fontSize: 11, color: 'var(--muted)', fontFamily: 'DM Mono, monospace' }}>
+                        {rec.reason}
+                      </div>
+                      <a href={rec.url} className="gumroad-button" style={{
+                        display: 'inline-flex', alignItems: 'center',
+                        padding: '9px 18px', textDecoration: 'none', whiteSpace: 'nowrap', flexShrink: 0,
+                        fontFamily: 'DM Sans, sans-serif', fontSize: 13, fontWeight: 500,
+                        background: 'var(--text)', color: '#fff', border: 'none', cursor: 'pointer',
+                      }}>
+                        Get This Guide →
+                      </a>
                     </div>
                   </div>
-                  <a
-                    href={rec.url}
-                    className="gumroad-button"
-                    style={{
-                      display: 'inline-flex', alignItems: 'center', gap: 8,
-                      padding: '10px 20px', flexShrink: 0, textDecoration: 'none',
-                      fontFamily: 'DM Sans, sans-serif', fontSize: 14, fontWeight: 500, whiteSpace: 'nowrap',
-                      background: 'var(--text)', color: '#fff', cursor: 'pointer', border: 'none',
-                    }}
-                  >
-                    Get This Guide →
-                  </a>
                 </div>
-              )}
-            </div>
-          ))}
+              </div>
+            );
+          })}
           <div style={{ textAlign: 'center', marginTop: 16 }}>
             <a href="/guides" style={{ fontSize: 14, color: 'var(--red)', textDecoration: 'none', fontWeight: 500 }}>
               Browse all 9 guides →
