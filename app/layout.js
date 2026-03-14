@@ -1,4 +1,5 @@
 import './globals.css';
+import { Analytics } from '@vercel/analytics/next';
 
 export const metadata = {
   title: 'AIJobRadar — How close are you to being replaced by AI?',
@@ -23,7 +24,7 @@ export default function RootLayout({ children }) {
         />
         <script src="https://gumroad.com/js/gumroad.js" async />
       </head>
-      <body>{children}</body>
+      <body>{children}<Analytics /></body>
     </html>
   );
 }
